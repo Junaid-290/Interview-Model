@@ -1,0 +1,24 @@
+{
+    "sessions": [
+        {
+            "name": "interview1",
+            "type": "interview",
+            "score": 80
+        },
+        {
+            "name": "presentation1",
+            "type": "presentation",
+            "score": 75
+        },
+        {
+            "name": "lecture1",
+            "type": "lecture",
+            "score": 90
+        },
+        {
+            "name": "meeting1",
+            "type": "meeting",
+            "score": 60
+        }
+    ]
+}

@@ -1,0 +1,33 @@
+# Models (VERY IMPORTANT)
+models/
+
+# Data (audio/video huge files)
+data/audio/
+data/video/
+
+# Cache
+__pycache__/
+*.pyc
+
+# OS junk
+.DS_Store
+Thumbs.db
+# Model files - never commit these
+models/
+*.pt
+*.bin
+*.safetensors
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.env
+
+# Data
+training_data/
+*.wav
+*.mp4
+
+# Environment
+.env
