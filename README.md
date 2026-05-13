@@ -1,3 +1,12 @@
+---
+emoji: 🚀
+title: Interview Model
+sdk: docker
+app_port: 7860
+colorFrom: blue
+colorTo: purple
+short_description: AI Interview Assistant
+---
 # AI Interview Model 🎙️
 
 An intelligent conversational interview platform powered by Groq (Llama 3.3 70B), Whisper STT, and SpeechT5 TTS. Conducts real adaptive interviews like Mercor.ai — asks follow-up questions based on your answers, detects weak responses, and generates scored feedback reports.
