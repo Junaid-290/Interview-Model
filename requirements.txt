@@ -17,3 +17,5 @@ sentencepiece==0.2.0
 huggingface-hub==0.24.0
 pyarrow==17.0.0
 faster-whisper==1.0.3
+datasets>=2.20.0
+setuptools>=70.0.0

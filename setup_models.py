@@ -4,8 +4,7 @@
 import os
 import torch
 import numpy as np
-import pyarrow as pa
-from huggingface_hub import hf_hub_download
+from datasets import load_dataset
 from sentence_transformers import SentenceTransformer
 from transformers import (
     WhisperProcessor, WhisperForConditionalGeneration,
@@ -30,46 +29,79 @@ print("✓ models/text_model/")
 print("\n[2/4] Speech-to-text model (Whisper tiny)...")
 proc = WhisperProcessor.from_pretrained("openai/whisper-tiny")
 wmodel = WhisperForConditionalGeneration.from_pretrained("openai/whisper-tiny")
-proc.save_pretrained(os.path.join(MODELS_DIR, "whisper_model"))
-wmodel.save_pretrained(os.path.join(MODELS_DIR, "whisper_model"))
+
+whisper_dir = os.path.join(MODELS_DIR, "whisper_model")
+
+proc.save_pretrained(whisper_dir)
+wmodel.save_pretrained(whisper_dir)
+
 print("✓ models/whisper_model/")
 
 # ── MODEL 3: Question Generation ──────────────────────────────
 print("\n[3/4] Question generation model (Flan-T5 small)...")
-t5 = T5ForConditionalGeneration.from_pretrained("google/flan-t5-small")
-t5tok = T5Tokenizer.from_pretrained("google/flan-t5-small")
-t5.save_pretrained(os.path.join(MODELS_DIR, "question_model"))
-t5tok.save_pretrained(os.path.join(MODELS_DIR, "question_model"))
+
+t5 = T5ForConditionalGeneration.from_pretrained(
+    "google/flan-t5-small"
+)
+
+t5tok = T5Tokenizer.from_pretrained(
+    "google/flan-t5-small"
+)
+
+question_dir = os.path.join(MODELS_DIR, "question_model")
+
+t5.save_pretrained(question_dir)
+t5tok.save_pretrained(question_dir)
+
 print("✓ models/question_model/")
 
 # ── MODEL 4: Text to Speech ───────────────────────────────────
 print("\n[4/4] Text-to-speech model (SpeechT5)...")
-tts_proc = SpeechT5Processor.from_pretrained("microsoft/speecht5_tts")
-tts_model = SpeechT5ForTextToSpeech.from_pretrained("microsoft/speecht5_tts")
-vocoder = SpeechT5HifiGan.from_pretrained("microsoft/speecht5_hifigan")
-tts_proc.save_pretrained(os.path.join(MODELS_DIR, "tts_model"))
-tts_model.save_pretrained(os.path.join(MODELS_DIR, "tts_model"))
-vocoder.save_pretrained(os.path.join(MODELS_DIR, "tts_model/vocoder"))
 
-# Speaker embedding (fixed method, no dataset scripts)
-print("  Downloading speaker embedding...")
-emb_path = hf_hub_download(
-    repo_id="Matthijs/cmu-arctic-xvectors",
-    filename="cmu-arctic-xvectors.arrow",
-    repo_type="dataset"
+tts_proc = SpeechT5Processor.from_pretrained(
+    "microsoft/speecht5_tts"
 )
-reader = pa.ipc.open_file(emb_path)
-table = reader.read_all()
-xvector = table["xvector"][7306].as_py()
+
+tts_model = SpeechT5ForTextToSpeech.from_pretrained(
+    "microsoft/speecht5_tts"
+)
+
+vocoder = SpeechT5HifiGan.from_pretrained(
+    "microsoft/speecht5_hifigan"
+)
+
+tts_dir = os.path.join(MODELS_DIR, "tts_model")
+
+tts_proc.save_pretrained(tts_dir)
+tts_model.save_pretrained(tts_dir)
+
+vocoder_dir = os.path.join(tts_dir, "vocoder")
+os.makedirs(vocoder_dir, exist_ok=True)
+
+vocoder.save_pretrained(vocoder_dir)
+
+# ── Speaker Embedding ─────────────────────────────────────────
+print("  Downloading speaker embedding...")
+
+embeddings_dataset = load_dataset(
+    "Matthijs/cmu-arctic-xvectors",
+    split="validation"
+)
+
+xvector = embeddings_dataset[7306]["xvector"]
+
 torch.save(
     torch.tensor(xvector).unsqueeze(0),
-    os.path.join(MODELS_DIR, "tts_model/speaker_embedding.pt")
+    os.path.join(tts_dir, "speaker_embedding.pt")
 )
+
 print("✓ models/tts_model/ + speaker_embedding.pt")
 
 print("\n" + "=" * 60)
 print("ALL MODELS DOWNLOADED")
 print("models/ folder now contains:")
+
 for item in os.listdir(MODELS_DIR):
     print(f"  ├── {item}")
+
 print("=" * 60)

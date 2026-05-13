@@ -2,16 +2,24 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y ffmpeg
+# System dependencies
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    git \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
 
+# Python dependencies
 COPY requirements.txt .
 
 RUN pip install --upgrade pip setuptools wheel
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy app files
 COPY . .
 
-RUN python setup_on_deploy.py
+# Pre-download models
+RUN python setup_models.py
 
 EXPOSE 7860
 
